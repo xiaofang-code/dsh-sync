@@ -5,7 +5,7 @@ Thanks for taking a look. This is a small, focused tool — the bar for changes 
 ## Setup
 
 ```bash
-git clone https://github.com/<you>/dsh-sync.git
+git clone https://github.com/xiaofang-code/dsh-sync.git
 cd dsh-sync
 npm install
 npm start                 # run the GUI

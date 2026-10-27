@@ -63,7 +63,7 @@ So copying `~/.dsh` to another machine with a different username silently breaks
 
 ### Option A — prebuilt package (Windows)
 
-1. Download `DSH会话同步.zip` from [Releases](../../releases)
+1. Download `DSH会话同步.zip` from [Releases](https://github.com/xiaofang-code/dsh-sync/releases)
 2. **Right-click → Extract All** (do not run from inside the archive)
 3. Double-click `启动.cmd`
 
@@ -76,7 +76,7 @@ So copying `~/.dsh` to another machine with a different username silently breaks
 ### Option B — from source
 
 ```bash
-git clone https://github.com/<you>/dsh-sync.git
+git clone https://github.com/xiaofang-code/dsh-sync.git
 cd dsh-sync
 npm install
 npm start          # run the GUI in dev mode
