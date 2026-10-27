@@ -63,7 +63,7 @@ DeepSeek Harness（DSH）把每个会话存成 zstd 压缩的追加式日志，�
 
 ### 方式 A —— 用打好的包（Windows）
 
-1. 从 [Releases](https://github.com/xiaofang-code/dsh-sync/releases) 下载 `DSH会话同步.zip`
+1. 从 [Releases](https://github.com/xiaofang-code/dsh-sync/releases) 下载 `DSH-Sync-v1.0.0-win32-x64.zip`
 2. **右键 → 全部解压**（不要直接在压缩包里双击）
 3. 双击 `启动.cmd`
 
