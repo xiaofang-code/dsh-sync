@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+<title>DSH 会话同步</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="logo">⇅</div>
+    <div>
+      <div class="brand-title">DSH 会话同步</div>
+      <div class="brand-sub" id="app-version">v1.0.0</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item active" data-page="home"><span>⌂</span> 首页</button>
+    <button class="nav-item" data-page="backup"><span>↑</span> 备份</button>
+    <button class="nav-item" data-page="restore"><span>↓</span> 还原</button>
+    <button class="nav-item" data-page="browse"><span>☰</span> 查看备份</button>
+    <button class="nav-item" data-page="doctor"><span>✚</span> 体检</button>
+    <button class="nav-item" data-page="settings"><span>⚙</span> 设置</button>
+  </nav>
+
+  <div class="side-foot">
+    <div class="status-dot" id="side-status"></div>
+    <div class="side-status-text" id="side-status-text">未设置</div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <!-- ══════════ 首页 ══════════ -->
+  <section class="page active" id="page-home">
+    <header class="page-head">
+      <h1>把会话搬到另一台电脑</h1>
+      <p class="sub">不用 git，不用命令行。选一个方向就行。</p>
+    </header>
+
+    <div class="cards">
+      <button class="big-card" id="home-backup">
+        <div class="bc-icon up">↑</div>
+        <div class="bc-title">备份</div>
+        <div class="bc-desc">把这台电脑的会话传出去<br /><span class="dim" id="home-backup-sub">先设置同步位置</span></div>
+      </button>
+      <button class="big-card" id="home-restore">
+        <div class="bc-icon down">↓</div>
+        <div class="bc-title">还原</div>
+        <div class="bc-desc">把备份里的会话拉到这台电脑<br /><span class="dim" id="home-restore-sub">先设置同步位置</span></div>
+      </button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>本机会话</h2>
+        <button class="btn ghost sm" id="home-refresh">刷新</button>
+      </div>
+      <div id="home-stats" class="stats"></div>
+      <div class="table-wrap">
+        <table class="tbl" id="home-table">
+          <thead>
+            <tr><th>会话 ID</th><th class="num">事件</th><th class="num">大小</th><th>预设</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 备份 ══════════ -->
+  <section class="page" id="page-backup">
+    <header class="page-head">
+      <h1>备份</h1>
+      <p class="sub">把这台电脑的会话传到同步位置。没变过的会话会自动跳过。</p>
+    </header>
+
+    <div class="panel">
+      <div class="kv"><span>同步位置</span><b id="backup-target">未设置</b></div>
+      <div class="kv"><span>DSH 目录</span><b id="backup-home">-</b></div>
+      <div class="actions">
+        <button class="btn primary" id="backup-start">开始备份</button>
+      </div>
+    </div>
+
+    <div class="panel grow">
+      <div class="panel-head"><h2>进度</h2><span class="dim" id="backup-phase"></span></div>
+      <div class="bar"><div class="bar-fill" id="backup-bar"></div></div>
+      <div class="log" id="backup-log"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 还原 ══════════ -->
+  <section class="page" id="page-restore">
+    <header class="page-head">
+      <h1>还原</h1>
+      <p class="sub">把同步位置里的会话拉到这台电脑。原有会话会被挪到回收目录，不会删。</p>
+    </header>
+
+    <div class="panel">
+      <div class="kv"><span>同步位置</span><b id="restore-target">未设置</b></div>
+      <div class="field">
+        <label>还原到哪个工作目录</label>
+        <div class="row">
+          <input type="text" id="restore-cwd" placeholder="C:\Users\你\Documents\deepseek-harness\default-workspace" />
+          <button class="btn ghost" id="restore-pick">选择…</button>
+        </div>
+        <p class="hint" id="restore-hint">如果这台电脑的用户名和原来不一样，改一下路径就行，工具会自动改写会话里记录的路径。</p>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="restore-start">开始还原</button>
+      </div>
+    </div>
+
+    <div class="panel grow">
+      <div class="panel-head"><h2>进度</h2><span class="dim" id="restore-phase"></span></div>
+      <div class="bar"><div class="bar-fill" id="restore-bar"></div></div>
+      <div class="log" id="restore-log"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 查看备份 ══════════ -->
+  <section class="page" id="page-browse">
+    <header class="page-head">
+      <h1>备份里有什么</h1>
+      <p class="sub" id="browse-sub">同步位置里的会话清单</p>
+    </header>
+    <div class="panel grow">
+      <div class="panel-head">
+        <h2>会话</h2>
+        <button class="btn ghost sm" id="browse-refresh">刷新</button>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl" id="browse-table">
+          <thead>
+            <tr><th>会话 ID</th><th class="num">事件</th><th class="num">大小</th><th>预设</th><th>工作目录</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="empty" id="browse-empty">还没有备份。先选「备份」。</div>
+    </div>
+  </section>
+
+  <!-- ══════════ 体检 ══════════ -->
+  <section class="page" id="page-doctor">
+    <header class="page-head">
+      <h1>体检</h1>
+      <p class="sub">检查会话文件有没有坏、附件齐不齐、同步位置通不通。</p>
+    </header>
+    <div class="panel">
+      <div class="actions"><button class="btn primary" id="doctor-run">开始检查</button></div>
+    </div>
+    <div class="panel grow">
+      <div class="checks" id="doctor-list"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 设置 ══════════ -->
+  <section class="page" id="page-settings">
+    <header class="page-head">
+      <h1>设置</h1>
+      <p class="sub">只需要设置一次。</p>
+    </header>
+
+    <div class="panel">
+      <div class="field">
+        <label>同步方式</label>
+        <div class="seg" id="backend-seg">
+          <button data-backend="local" class="active">本地文件夹</button>
+          <button data-backend="webdav">WebDAV 网盘</button>
+          <button data-backend="s3">S3 对象存储</button>
+        </div>
+      </div>
+
+      <div data-backend-panel="local">
+        <div class="field">
+          <label>备份存到哪个文件夹</label>
+          <div class="row">
+            <input type="text" id="local-path" placeholder="D:\dsh-backup" />
+            <button class="btn ghost" id="local-pick">选择…</button>
+          </div>
+          <p class="hint">U 盘、移动硬盘、局域网共享都行。放进 OneDrive / 坚果云的同步目录，就等于云同步。</p>
+        </div>
+      </div>
+
+      <div data-backend-panel="webdav" hidden>
+        <div class="field">
+          <label>WebDAV 地址</label>
+          <input type="text" id="dav-url" placeholder="https://dav.jianguoyun.com/dav/dsh" />
+        </div>
+        <div class="grid2">
+          <div class="field"><label>用户名</label><input type="text" id="dav-user" /></div>
+          <div class="field"><label>密码 / 应用密码</label><input type="password" id="dav-pass" /></div>
+        </div>
+      </div>
+
+      <div data-backend-panel="s3" hidden>
+        <div class="field"><label>Endpoint</label><input type="text" id="s3-endpoint" placeholder="https://oss-cn-hangzhou.aliyuncs.com" /></div>
+        <div class="grid2">
+          <div class="field"><label>Bucket</label><input type="text" id="s3-bucket" /></div>
+          <div class="field"><label>Region</label><input type="text" id="s3-region" placeholder="us-east-1" /></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>AccessKeyId</label><input type="text" id="s3-key" /></div>
+          <div class="field"><label>AccessKeySecret</label><input type="password" id="s3-secret" /></div>
+        </div>
+        <div class="field"><label>前缀目录</label><input type="text" id="s3-prefix" placeholder="dsh-sync" /></div>
+      </div>
+
+      <div class="field">
+        <label>DSH 数据目录</label>
+        <div class="row">
+          <input type="text" id="dsh-home" />
+          <button class="btn ghost" id="dsh-pick">选择…</button>
+        </div>
+        <p class="hint">通常不用改。默认是 <code>%USERPROFILE%\.dsh</code>。</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="settings-save">保存设置</button>
+        <button class="btn ghost" id="settings-test">测试连接</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>回收目录</h2></div>
+      <p class="hint">每次还原前，原有会话会被改名挪到这里。确认新会话没问题后可以手动删掉。</p>
+      <div id="trash-list" class="trash-list"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>关于</h2></div>
+      <div class="kv"><span>版本</span><b id="about-version">-</b></div>
+      <div class="kv"><span>配置文件</span><b id="about-config" class="mono">-</b></div>
+      <div class="kv"><span>Electron</span><b id="about-electron">-</b></div>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

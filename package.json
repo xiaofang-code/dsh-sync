@@ -1,0 +1,37 @@
+{
+  "name": "dsh-sync",
+  "productName": "DSH 会话同步",
+  "version": "1.0.0",
+  "description": "Move DeepSeek Harness chat sessions between computers. No git, no cloud account, automatic path rewriting.",
+  "main": "gui/main.cjs",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "cli": "node dsh-sync.mjs",
+    "icon": "node build/make-icon.mjs",
+    "build": "node build/pack.mjs && node build/pack-zip.mjs"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "session",
+    "sync",
+    "backup",
+    "zstd",
+    "electron"
+  ],
+  "author": "YG",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<you>/dsh-sync.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^45.0.0"
+  }
+}
